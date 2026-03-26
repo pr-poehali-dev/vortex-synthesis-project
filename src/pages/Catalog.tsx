@@ -4,6 +4,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Icon from "@/components/ui/icon"
 
+const SEND_ORDER_URL = "https://functions.poehali.dev/8ebc8d2f-411e-48c1-a526-602d50b70ecf"
+
 const GAMES = ["Все", "Dota 2", "CS2", "Valorant", "World of Warcraft", "Fortnite", "GTA V"]
 
 const LISTINGS = [
@@ -18,9 +20,115 @@ const LISTINGS = [
   { id: 9, game: "Valorant", rank: "Immortal 3", mmr: "320 побед", hours: "600 ч", skins: "Vandal Prime", price: 1100, color: "bg-pink-800", initials: "VL", hot: false },
 ]
 
+type Listing = typeof LISTINGS[0]
+
+function BuyModal({ item, onClose }: { item: Listing; onClose: () => void }) {
+  const [name, setName] = useState("")
+  const [contact, setContact] = useState("")
+  const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    setStatus("loading")
+    try {
+      const res = await fetch(SEND_ORDER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, contact, game: item.game, rank: item.rank, price: item.price }),
+      })
+      if (res.ok) {
+        setStatus("success")
+      } else {
+        setStatus("error")
+      }
+    } catch {
+      setStatus("error")
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center px-4" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+      <div
+        className="relative z-10 w-full max-w-md rounded-2xl bg-[#141414] border border-[#262626] p-6"
+        onClick={e => e.stopPropagation()}
+      >
+        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-white">
+          <Icon name="X" size={20} />
+        </button>
+
+        {status === "success" ? (
+          <div className="text-center py-6">
+            <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-violet-500/20">
+              <Icon name="CheckCircle2" size={28} className="text-violet-400" />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Заявка отправлена!</h3>
+            <p className="text-gray-400 text-sm mb-6">Мы свяжемся с вами в ближайшее время для завершения сделки.</p>
+            <Button onClick={onClose} className="rounded-full bg-violet-600 hover:bg-violet-700 text-white px-6">
+              Закрыть
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="flex items-center gap-3 mb-6">
+              <div className={`h-12 w-12 rounded-xl ${item.color} flex items-center justify-center text-white font-bold text-sm`}>
+                {item.initials}
+              </div>
+              <div>
+                <p className="text-white font-semibold">{item.game}</p>
+                <p className="text-violet-400 text-sm">{item.rank}</p>
+              </div>
+              <span className="ml-auto text-xl font-bold text-white">{item.price.toLocaleString("ru")} ₽</span>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5">Ваше имя</label>
+                <input
+                  type="text"
+                  required
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  placeholder="Иван Иванов"
+                  className="w-full rounded-lg bg-[#0f0f0f] border border-[#262626] px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-violet-500 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-xs text-gray-400 mb-1.5">Email или телефон для связи</label>
+                <input
+                  type="text"
+                  required
+                  value={contact}
+                  onChange={e => setContact(e.target.value)}
+                  placeholder="ivan@example.com"
+                  className="w-full rounded-lg bg-[#0f0f0f] border border-[#262626] px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-violet-500 transition-colors"
+                />
+              </div>
+
+              {status === "error" && (
+                <p className="text-red-400 text-xs">Ошибка отправки. Попробуйте ещё раз.</p>
+              )}
+
+              <Button
+                type="submit"
+                disabled={status === "loading"}
+                className="w-full rounded-full bg-violet-600 hover:bg-violet-700 text-white mt-2"
+              >
+                {status === "loading" ? "Отправляем..." : "Оформить заявку"}
+              </Button>
+              <p className="text-center text-xs text-gray-500">Деньги списываются только после проверки аккаунта</p>
+            </form>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
 export default function Catalog() {
   const [activeGame, setActiveGame] = useState("Все")
   const [sortBy, setSortBy] = useState("popular")
+  const [selectedItem, setSelectedItem] = useState<Listing | null>(null)
 
   const filtered = LISTINGS.filter(l => activeGame === "Все" || l.game === activeGame)
   const sorted = [...filtered].sort((a, b) => {
@@ -33,13 +141,14 @@ export default function Catalog() {
     <main className="min-h-screen bg-[#0a0a0a]">
       <Header />
 
+      {selectedItem && <BuyModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+
       <section className="px-4 md:px-8 py-10 max-w-6xl mx-auto">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-white mb-2">Каталог аккаунтов</h1>
           <p className="text-gray-400">Проверенные профили с гарантией безопасной сделки</p>
         </div>
 
-        {/* Фильтры по играм */}
         <div className="flex flex-wrap gap-2 mb-6">
           {GAMES.map(game => (
             <button
@@ -66,10 +175,9 @@ export default function Catalog() {
           </select>
         </div>
 
-        {/* Карточки */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {sorted.map(item => (
-            <div key={item.id} className="rounded-2xl bg-[#141414] border border-[#262626] p-5 flex flex-col hover:border-violet-500/40 transition-colors group">
+            <div key={item.id} className="rounded-2xl bg-[#141414] border border-[#262626] p-5 flex flex-col hover:border-violet-500/40 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div className={`h-12 w-12 rounded-xl ${item.color} flex items-center justify-center text-white font-bold text-sm`}>
@@ -102,7 +210,11 @@ export default function Catalog() {
 
               <div className="flex items-center justify-between mt-auto pt-4 border-t border-[#262626]">
                 <span className="text-xl font-bold text-white">{item.price.toLocaleString("ru")} ₽</span>
-                <Button size="sm" className="rounded-full bg-violet-600 hover:bg-violet-700 text-white text-sm px-4">
+                <Button
+                  size="sm"
+                  onClick={() => setSelectedItem(item)}
+                  className="rounded-full bg-violet-600 hover:bg-violet-700 text-white text-sm px-4"
+                >
                   Купить
                 </Button>
               </div>
