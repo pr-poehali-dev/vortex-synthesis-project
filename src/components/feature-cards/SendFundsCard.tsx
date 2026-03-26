@@ -1,4 +1,4 @@
-import { Zap, Building2, ChevronDown, Info } from "lucide-react"
+import { Zap, Search, ChevronDown, Info } from "lucide-react"
 import { Switch } from "@/components/ui/switch"
 import { ArrowUpRight } from "lucide-react"
 
@@ -9,8 +9,8 @@ export function SendFundsCard() {
         <Zap className="h-5 w-5 text-gray-400" />
       </div>
 
-      <h3 className="mb-2 text-lg font-semibold text-white">Мгновенные переводы</h3>
-      <p className="mb-4 text-sm text-gray-400">Платите клиентам, партнёрам и поставщикам за секунды без задержек</p>
+      <h3 className="mb-2 text-lg font-semibold text-white">Мгновенная передача</h3>
+      <p className="mb-4 text-sm text-gray-400">Получи данные аккаунта за 5 минут после оплаты — круглосуточно, без выходных</p>
 
       <a href="#" className="mb-6 inline-flex items-center text-sm text-gray-400 hover:text-white transition-colors">
         Подробнее <ArrowUpRight className="ml-1 h-4 w-4" />
@@ -19,10 +19,10 @@ export function SendFundsCard() {
       <div className="mt-auto space-y-4 rounded-xl bg-[#1a1a1a] border border-[#262626] p-4">
         <div className="flex items-center justify-between rounded-lg bg-[#0f0f0f] border border-[#262626] px-3 py-2.5">
           <div className="flex items-center gap-3">
-            <Building2 className="h-5 w-5 text-gray-500" />
+            <Search className="h-5 w-5 text-gray-500" />
             <div>
-              <p className="text-sm font-medium text-white">Операционный счёт</p>
-              <p className="text-xs text-gray-500">Доступно: 1 500 000 ₽</p>
+              <p className="text-sm font-medium text-white">Найти игру</p>
+              <p className="text-xs text-gray-500">Dota 2, CS2, Valorant...</p>
             </div>
           </div>
           <ChevronDown className="h-4 w-4 text-gray-500" />
@@ -30,7 +30,7 @@ export function SendFundsCard() {
 
         <div>
           <label className="mb-2 flex items-center gap-1 text-xs text-gray-400">
-            Введите сумму <Info className="h-3 w-3" />
+            Бюджет <Info className="h-3 w-3" />
           </label>
           <div className="flex items-center rounded-lg bg-[#0f0f0f] border border-[#262626] px-3 py-2.5">
             <span className="text-gray-500 mr-2">₽</span>
@@ -44,11 +44,11 @@ export function SendFundsCard() {
 
         <div>
           <label className="mb-2 flex items-center gap-1 text-xs text-gray-400">
-            Назначение платежа <span className="text-violet-400">*</span> (Необязательно)
+            Пожелания к аккаунту <span className="text-violet-400">*</span> (необязательно)
           </label>
           <div className="relative">
             <textarea
-              placeholder="Сообщение для получателя..."
+              placeholder="Например: ранг, уровень, скины..."
               className="w-full rounded-lg bg-[#0f0f0f] border border-[#262626] px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none resize-none h-16"
             />
             <span className="absolute bottom-2 right-2 text-xs text-gray-600">0/200</span>
@@ -57,7 +57,7 @@ export function SendFundsCard() {
 
         <div className="flex items-center justify-between pt-2">
           <Switch className="data-[state=checked]:bg-violet-600" />
-          <span className="text-sm text-gray-400">Регулярный платёж</span>
+          <span className="text-sm text-gray-400">Уведомить о новых лотах</span>
         </div>
       </div>
     </div>
